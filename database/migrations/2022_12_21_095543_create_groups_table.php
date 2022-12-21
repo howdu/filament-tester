@@ -13,10 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('commentables', function (Blueprint $table) {
-            $table->foreignId('comment_id')->constrained()->cascadeOnDelete();
-            $table->morphs('commentable');
-            $table->unsignedSmallInteger('ordered')->nullable();
+        Schema::create('groups', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->timestamps();
         });
     }
 
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('commentables');
+        Schema::dropIfExists('groups');
     }
 };

@@ -28,25 +28,11 @@ class ProductResource extends Resource
         return [
             Forms\Components\TextInput::make('name')
                 ->required(),
-            Forms\Components\Repeater::make('attributes')
-                ->relationship()
+            Forms\Components\Select::make('product_type_id')
+                ->relationship('productType', 'name')
+                ->preload()
                 ->required()
-                ->columnSpanFull()
-                ->schema([
-                    Forms\Components\Grid::make(3)
-                        ->schema([
-                            Forms\Components\TextInput::make('key'),
-                            Forms\Components\TextInput::make('value'),
-                            Forms\Components\Select::make('group_id')
-                                ->relationship('group', 'name')
-                                ->preload()
-                                ->required()
-                                ->createOptionForm([
-                                    Forms\Components\TextInput::make('name')
-                                        ->required()
-                                ])
-                        ])
-                ])
+                ->createOptionForm(ProductTypeResource::getFormSchema()),
         ];
     }
 
@@ -61,51 +47,19 @@ class ProductResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('attributes_count')
-                    ->label('Attributes')
-                    ->alignCenter(),
-                Tables\Columns\TextColumn::make('comments_count')
-                    ->label('Comments')
-                    ->alignCenter()
+                Tables\Columns\TextColumn::make('productType.name')->label('Type name'),
+                Tables\Columns\TextColumn::make('productType.status')->label('Type status'),
             ])
             ->filters([
-                //
+                Tables\Filters\TernaryFilter::make('productType.status')
+                    ->label(__('Status'))
+                    ->placeholder(__('All'))
+                    ->trueLabel(__('Enabled'))
+                    ->falseLabel(__('Disabled'))
+                    ->default(true)
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\ReplicateAction::make()
-                    ->form(ProductResource::getFormSchema())
-                    ->action(function (Model $record, array $data, Tables\Actions\ReplicateAction $action, $form) {
-                        $replica = $record->replicate(['attributes_count', 'comments_count']);
-                        $replica->name = $data['name'];
-
-                        if (!$replica->save()) {
-                            return false;
-                        }
-
-                        // Manually save attributes relationship
-                        foreach($form->getComponents() as $component) {
-                            if (!$component instanceof Forms\Components\Repeater ||
-                                $component->getStatePath(false) !== 'attributes') {
-                                continue;
-                            }
-
-                            $childComponentContainers = $component->getChildComponentContainers();
-
-                            foreach ($childComponentContainers as $item) {
-                                $itemData = $item->getState(shouldCallHooksBefore: false);
-
-                                $replica->attributes()->create($itemData);
-                            }
-                        }
-
-                        Notification::make()
-                            ->title('Product replicated successfully')
-                            ->success()
-                            ->send();
-
-                        $action->redirect(ProductResource::getUrl('edit', $replica->getKey()));
-                    })
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
@@ -115,7 +69,7 @@ class ProductResource extends Resource
     public static function getEloquentQuery(): Builder
     {
         return parent::getEloquentQuery()
-            ->withCount(['attributes', 'comments'])
+            ->with('productType')
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ]);
@@ -124,7 +78,7 @@ class ProductResource extends Resource
     public static function getRelations(): array
     {
         return [
-            RelationManagers\CommentRelationManager::class
+            //RelationManagers\CommentRelationManager::class
         ];
     }
 

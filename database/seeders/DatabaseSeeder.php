@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\ProductType;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -14,11 +15,22 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        $productTypeEnabled = \App\Models\ProductType::create([
+            'name' => 'Enabled',
+            'status' => 1
+        ]);
 
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        $productTypeDisabled = \App\Models\ProductType::create([
+            'name' => 'Disabled',
+            'status' => 0
+        ]);
+
+        \App\Models\Product::factory(6)
+            ->for($productTypeEnabled)
+            ->create();
+
+        \App\Models\Product::factory(4)
+            ->for($productTypeDisabled)
+            ->create();
     }
 }

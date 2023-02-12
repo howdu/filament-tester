@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\ProductFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,14 +28,13 @@ class Product extends Model
         return $this->belongsTo(ProductType::class);
     }
 
-    public function attributes(): HasMany
+    /**
+     * Create a new factory instance for the model.
+     *
+     * @return \Illuminate\Database\Eloquent\Factories\Factory
+     */
+    protected static function newFactory()
     {
-        return $this->hasMany(ProductAttribute::class);
-    }
-
-    public function comments(): MorphToMany
-    {
-        return $this->morphToMany(Comment::class, 'commentable', 'commentables')
-            ->withPivot('ordered')->orderByRaw('ISNULL(commentables.ordered), commentables.ordered ASC');
+        return ProductFactory::new();
     }
 }

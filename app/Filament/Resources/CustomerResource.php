@@ -27,12 +27,15 @@ class CustomerResource extends Resource
                 Forms\Components\Repeater::make('customer_addresses')
                     ->relationship('addresses')
                     ->schema([
+                        Forms\Components\Select::make('address_id')
+                            ->hiddenOn('edit')
+                            ->relationship('address', 'name'),
+
                         Forms\Components\Group::make()
                             ->relationship('address')
+                            ->visibleOn('edit')
                             ->schema([
                                 Forms\Components\TextInput::make('name'),
-                                Forms\Components\Select::make('country_id')
-                                    ->relationship('country', 'name')
                             ])
                     ])
             ]);

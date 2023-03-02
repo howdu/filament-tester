@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CountryResource\Pages;
-use App\Filament\Resources\CountryResource\RelationManagers;
-use App\Models\Country;
+use App\Filament\Resources\AddressResource\Pages;
+use App\Filament\Resources\AddressResource\RelationManagers;
+use App\Models\Address;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -13,9 +13,9 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class CountryResource extends Resource
+class AddressResource extends Resource
 {
-    protected static ?string $model = Country::class;
+    protected static ?string $model = Address::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-collection';
 
@@ -23,8 +23,7 @@ class CountryResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\TextInput::make('name')
-                    ->required()
+                Forms\Components\TextInput::make('name'),
             ]);
     }
 
@@ -32,7 +31,7 @@ class CountryResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name')
+                //
             ])
             ->filters([
                 //
@@ -55,9 +54,9 @@ class CountryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListCountries::route('/'),
-            'create' => Pages\CreateCountry::route('/create'),
-            'edit' => Pages\EditCountry::route('/{record}/edit'),
+            'index' => Pages\ListAddresses::route('/'),
+            'create' => Pages\CreateAddress::route('/create'),
+            'edit' => Pages\EditAddress::route('/{record}/edit'),
         ];
     }    
 }
